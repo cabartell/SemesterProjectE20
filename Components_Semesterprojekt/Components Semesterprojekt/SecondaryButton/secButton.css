@@ -1,0 +1,21 @@
+.btn {
+	color: white;
+    border-radius: 10rem;
+    font-size: 1rem;
+  	height: 32px;
+    padding-left: 2em;
+  	padding-right: 2em;
+    border: solid 2px transparent;
+    background-image: linear-gradient(rgba(24, 24, 24, 0), rgba(24, 24, 24, 0)), linear-gradient(101deg, #E75353, #FED97B);
+    background-origin: border-box;
+    box-shadow: 1px 1000px 0px rgb(24, 24, 24) inset;
+    font-family: 'Inter', sans-serif;
+  	display: inline-flex;
+	justify-content: center;
+	align-items: center;
+}
+.btn:hover {
+  	color: black;
+    box-shadow: 1px 1000px 0px rgb(255, 255, 255) inset;
+  	cursor: pointer;
+}

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1 idkey="id0"></h1>
+    <h2 idkey="id1"></h2>
+    <h3 idkey="id2"></h3>
+    <h4 idkey="id3"></h4>
+    <p idkey="id4"></p>
+    <p idkey="id5"></p>
+    <p idkey="id6"></p>
+    <p idkey="id7"></p>
+    <p idkey="id8"></p>
+    <p idkey="id9"></p>
+    <p idkey="id10"></p>
+    <p idkey="id11"></p>
+    <p idkey="id12"></p>
+    <p idkey="id13"></p>
+    <p idkey="id14"></p>
+    <p idkey="id15"></p>
+    <p idkey="id16"></p>
+    <p idkey="id17"></p>
+    <p idkey="id32"></p>
+    <div id="list"></div>
+
+    <script>
+
+        let list = document.getElementById('list');
+        let defaultlanguage = String(navigator.language).substring(0, 2);
+
+        // fetch list of all languages
+        async function fetchLanguages() {
+            let data = await fetch(`http://mint.stream.stud-srv.sdu.dk/language/languages`)
+                .then(res => res.json())
+                .catch(err => console.log("error" + err));
+
+            // generate a list of buttons of each language
+            for (language in data) {
+                let val = data[language];
+                let button = document.createElement('button');
+                button.innerText = val.language;
+                button.setAttribute('lang-code', val.code);
+                list.appendChild(button);
+            }
+
+            // create click events for every button
+            for (let i = 0; i < list.children.length; i++) {
+                let button = list.childNodes[i];
+                button.addEventListener('click', () => {
+                    fetchLangData(button.getAttribute('lang-code'));
+                });
+            }
+        }
+
+        // fetch language data based on language code
+        async function fetchLangData(languagecode) {
+
+            console.log("trying to fetch " + languagecode);
+
+            let data = await fetch(`http://mint.stream.stud-srv.sdu.dk/language/code/${languagecode}`)
+                .then(res => res.json())
+                .catch(err => console.log("error" + err));
+
+            document.querySelectorAll(`[idkey]`).forEach(element => {
+                let key = element.getAttribute('idkey');
+                if (key) {
+                    element.textContent = data.strings[key];
+                }
+            });
+        }
+
+        window.addEventListener('load', () => {
+
+            fetchLanguages();
+            fetchLangData(defaultlanguage);
+
+        });
+
+    </script>
+</body>
+
+</html>

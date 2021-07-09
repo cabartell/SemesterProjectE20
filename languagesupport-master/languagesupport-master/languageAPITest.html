@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="origin">
+    <title>Document</title>
+
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        .stylepls {
+            margin-top: 2em;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1em;
+        }
+
+        button {
+            padding: 0.5em;
+        }
+
+        input {
+            padding: 0.3em;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="wrapper">
+        <div class="language stylepls">
+            <h2>Language API</h2>
+            <p>fetching from <strong>http://mint.stream.stud-srv.sdu.dk/language/</strong></p>
+            <div class="buttonarray">
+                <button id="languages">languages</button>
+                <button id="code/da">code/da</button>
+                <button id="code/ar">code/ar</button>
+                <button id="update">update</button>
+                <button id="postUpdate">[Post] update</button>
+                <button id="/">/</button>
+                <button id="language/Danish">language/Danish</button>
+            </div>
+            <input id="input" type="text" placeholder="/">
+            <pre id="output"></pre>
+        </div>
+    </div>
+
+
+    <script>
+
+        let output = document.getElementById('output');
+        let input = document.getElementById('input');
+
+        input.addEventListener('change', () => { fetchLangData() });
+
+        // buttons
+        let languagesBtn = document.getElementById('languages');
+        let codeDaBtn = document.getElementById('code/da');
+        let codeArBtn = document.getElementById('code/ar');
+        let updateBtn = document.getElementById('update');
+        let postUpdateBtn = document.getElementById('postUpdate');
+        let rootBtn = document.getElementById('/');
+        let languageDanishBtn = document.getElementById('language/Danish');
+
+        languagesBtn.addEventListener('click', () => { fetchLangData("languages") });
+        codeDaBtn.addEventListener('click', () => { fetchLangData("code/da") });
+        codeArBtn.addEventListener('click', () => { fetchLangData("code/ar") });
+        updateBtn.addEventListener('click', () => { fetchLangData("update") });
+        postUpdateBtn.addEventListener('click', () => { postLangData("update") });
+        rootBtn.addEventListener('click', () => { fetchLangData() });
+        languageDanishBtn.addEventListener('click', () => { fetchLangData("language/Danish") });
+
+        // on load
+        window.addEventListener('load', () => {
+            let defaultlanguage = String(navigator.language).substring(0, 2);
+            lang = defaultlanguage;
+            fetchLangData()
+        });
+
+        async function postLangData(inputText) {
+            let promise = await fetch(`http://mint.stream.stud-srv.sdu.dk/language/${inputText}`, {
+                method: 'POST'
+            }).then(res => res.json())
+
+            output.innerText = JSON.stringify(promise, null, 2)
+
+            return promise
+        }
+
+        async function fetchLangData(inputText) {
+            let search = ""
+
+            if (inputText) {
+                search = inputText
+            } else {
+                search = input.value
+            }
+
+            let promise = await fetch(`http://mint.stream.stud-srv.sdu.dk/language/${search}`)
+                .then(res => res.json())
+                .catch(output.innerText = "not valid")
+
+            let data = promise;
+
+            output.innerText = JSON.stringify(data, null, 2)
+
+            return data
+        }
+
+    </script>
+</body>
+
+</html>

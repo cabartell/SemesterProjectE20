@@ -1,0 +1,130 @@
+apiVersion: v1
+kind: Service
+metadata:
+    name: language
+spec:
+    selector:
+    # This app must match the label of the pods.
+        app: g02-languageserver
+    ports:
+      - protocol: TCP
+        port: 80
+        targetPort: 3001
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: g02-languageserver
+spec:
+    selector:
+        matchLabels:
+            app: g02-languageserver
+    replicas: 1
+    template:
+        metadata:
+            labels:
+                app: g02-languageserver
+        spec:
+            imagePullSecrets:
+                - name: sdugitlab
+            containers:
+            - name: g02-languageserver
+              image: IMAGE_IS_INSERTED_USING_GITLAB
+              imagePullPolicy: Always
+              ports:
+              - containerPort: 3001
+              resources:
+                  requests:
+                      cpu: "100m"
+                      memory: "150Mi"
+                  limits:
+                      cpu: "200m"
+                      memory: "250Mi"
+              env:
+                  - name: MONGODB_HOST
+                    value: "g02-languagemongodb"
+                  - name: MONGODB_PORT
+                    value: "27017"
+                  - name: MONGODB_DB_NAME
+                    value: "g02-language"
+                
+---
+apiVersion: v1
+kind: Service
+metadata:
+    name: g02-languagemongodb
+spec:
+    selector:
+        # This app must match the label of the pods.
+        app: g02-languagemongodb
+    ports:
+      - protocol: TCP
+        name: mongo
+        port: 27017
+        targetPort: 27017
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: g02-languagemongodb
+spec:
+    selector:
+        matchLabels:
+            app: g02-languagemongodb
+    replicas: 1
+    template:
+        metadata:
+            labels:
+                app: g02-languagemongodb
+        spec:
+            containers:
+            - name: g02-languagemongodb
+              image: mongo:latest
+              ports:
+              - containerPort: 27017
+              resources:
+                  requests:
+                      cpu: "100m"
+                      memory: "300Mi"
+                  limits:
+                      cpu: "100m"
+                      memory: "400Mi"
+              volumeMounts:
+              - name: g02-languagemongodb-init
+                mountPath: /etc/mongod.conf
+              - name: g02-languagemongodb-data
+                mountPath: /data/db
+            volumes:
+            - name: g02-languagemongodb-init
+              configMap:
+                  name: g02-languagemongodb-init-config
+            - name: g02-languagemongodb-data
+              persistentVolumeClaim:
+                  claimName: g02-languagemongodb-data-claim
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: g02-languagemongodb-init-config
+    labels:
+        app: g02-languagemongodb
+data:
+    mongodb.conf: |
+        net:
+            bindIpAll: true
+        storage:
+            dbPath: /data/db
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: g02-languagemongodb-data-claim
+  labels:
+      app: g02-languagemongodb
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 500Mi

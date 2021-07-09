@@ -1,0 +1,28 @@
+version: '3.4'
+
+services:
+  nodeserver:
+    image: languageserver
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    environment:
+      NODE_ENV: production
+      MONGODB_HOST: mongodb
+      MONGODB_PORT: 27017
+      MONGODB_DB_NAME: language
+    ports:
+      - 3001:3001
+    volumes:
+      - .:/usr/src/app
+    links:
+      - mongodb
+  mongodb:
+    image: mongo:latest
+    ports:
+      - 27019:27017
+    volumes:
+      - data:/data/db
+
+volumes:
+  data:

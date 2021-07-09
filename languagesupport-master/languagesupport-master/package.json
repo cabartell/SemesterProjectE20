@@ -1,0 +1,21 @@
+{
+  "name": "language_server",
+  "version": "1.0.0",
+  "description": "A backend for getting languages",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "author": "HMI",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "mongoose": "^5.10.9",
+    "morgan": "^1.10.0",
+    "node-fetch": "^2.6.1",
+    "nodemon": "^2.0.6"
+  }
+}
