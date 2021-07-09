@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="origin">
+    <title>Document</title>
+    <script src="https://ajax.googleapis.com.mcas.ms/ajax/libs/jquery/3.5.1/jquery.min.js?McasCtx=512"></script>
+
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .wrapper {
+            margin-top: 4em;
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            gap: 8em;
+        }
+
+        .stylepls {
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1em;
+        }
+
+        button {
+            padding: 0.5em;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5em;
+        }
+
+        input {
+            padding: 0.3em;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="wrapper">
+        <div class="addwrapper">
+            <form method="POST">
+                <labal for="thumbnail">Thumbnail</labal>
+                <input type="text" id="thumbnail" placeholder="img:url">
+                <labal for="name">Playlist Name</labal>
+                <input type="text" id="name" placeholder="playlist name">
+                <labal for="description">Playlist Description</labal>
+                <input type="text" id="description" placeholder="playlist description">
+                <labal for="owner_id">Owner ID</labal>
+                <input type="text" id="owner_id" placeholder="the id of the owner">
+                <labal for="duration">Duration in seconds</labal>
+                <input type="number" id="duration" placeholder="duration in seconds">
+                <labal for="release_date">Release Date</labal>
+                <input type="date" id="release_date" placeholder="release date">
+                <labal for="public_status">public?</labal>
+                <input type="checkbox" id="public_status" placeholder="public?">
+                <button type="button" id="submit">submit</button>
+            </form>
+        </div>
+        <hc>
+        <div class="playlist stylepls">
+            <h2>Playlist API</h2>
+            <p>fetching from <strong>http://mint.stream.stud-srv.sdu.dk/playlist/</strong></p>
+            <input id="input" type="text" placeholder="/">
+            <pre id="output"></pre>
+        </div>
+
+    </div>
+
+    <script>
+        let thumbnail = document.getElementById('thumbnail');
+        let playlistname = document.getElementById('name');
+        let description = document.getElementById('description');
+        let owner_id = document.getElementById('owner_id');
+        let public_status = document.getElementById('public_status');
+        let duration = document.getElementById('duration');
+        let release_date = document.getElementById('release_date');
+        let submit = document.getElementById('submit');
+
+        submit.addEventListener('click', () => {
+            addPlaylist()
+        })
+
+        let output = document.getElementById('output');
+        let input = document.getElementById('input');
+
+        input.addEventListener('change', () => {
+            fetchPlaylistData(input.value) 
+        });
+
+        // on load
+        window.addEventListener('load', () => {
+
+            fetchPlaylistData()
+        });
+
+        async function addPlaylist() {
+            $.ajax({
+                    url: 'http://mint.stream.stud-srv.sdu.dk/playlist/add',
+                    type: "POST",
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify({
+                        "thumbnail": thumbnail.value,
+                        "name": playlistname.value,
+                        "description": description.value,
+                        "owner_id": owner_id.value,
+                        "public_status": public_status.checked,
+                        "duration": parseInt(duration.value),
+                        "release_date": release_date.value
+                    }),
+                    success: function (result) {
+                        console.log(result);
+                    },
+                    error: function () {
+                        console.log("error");
+                    }
+                });
+        }
+
+        async function fetchPlaylistData(inputText) {
+            let search = ""
+
+            if (inputText) {
+                search = inputText
+            } else {
+                search = input.value
+            }
+
+            let promise = await fetch(`http://mint.stream.stud-srv.sdu.dk/playlist/${search}`)
+                .then(res => res.json())
+                .catch(output.innerText = "not valid")
+
+            let data = promise;
+
+            output.innerText = JSON.stringify(data, null, 2)
+
+            return data
+        }
+
+    </script>
+</body>
+
+</html>
